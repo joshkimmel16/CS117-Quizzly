@@ -1,10 +1,9 @@
-*.o
-*.so
-*.pyc
-build/
-PyBluez.egg-info/
-dist/
+# Python Nonsense #
+###################
+__pycache__/
+*.py[cod]
+*$py.class
 
-# Mac detritus 
-.DS_Store
-xcuserdata/
+# Random Specific Files (TODO: Remove at end of project) #
+##########################################################
+*BluetoothLib.py
