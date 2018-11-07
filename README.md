@@ -26,5 +26,5 @@ TODO: write installations instructions.
 
 * **Josh Kimmel** - *Bluetooth Interface* - (https://github.com/joshkimmel16)
 * **Peiqi Wu** - *???* - (https://github.com/???)
-* **Revaz ???** - *???* - (https://github.com/???)
-* **Jayant ???** - *???* - (https://github.com/???)
+* **Revaz Patel** - *???* - (https://github.com/???)
+* **Jayant Mehra** - *???* - (https://github.com/???)
