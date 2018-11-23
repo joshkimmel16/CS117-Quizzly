@@ -1,0 +1,61 @@
+/*********************
+This file defines the expected JSON data to be passed in various scenarios from the server to the mobile application
+or vice versa
+*********************/
+
+/***
+Registering a player in a new game
+Mobile app => server
+**/
+{
+    "type": "playerCreation", //this will be fixed
+    "data": {
+        "playerName": "XYZ" //this will be some alphanumeric string    
+    }
+}
+
+/***
+Sending a new question to be answered
+Server => mobile app
+**/
+{
+    "type": "question", //this will be fixed
+    "data": {
+        "number": 0, //this will be some positive integer
+        "category": "XYZ", //this will be some string with the category of the question
+        "question": "ABC", //this will be some string with the question to answer
+        "options": [
+            "OPTION A" //these will be strings with potential answers to the question
+        ],
+        "answer": 0 //this will be an index in the options array corresponding to the correct answer
+    }
+}
+
+/***
+Sending an answer to a question
+Mobile app => server
+**/
+{
+    "type": "answer", //this will be fixed
+    "data": {
+        "number": 0, //this will be a positive integer and must correspond to some provided question
+        "answer": 0 //this will be an index in the options array provided in the question corresponding to the selected answer
+    }
+}
+
+/***
+Sending a score update for the current game. Also captures if the game is over or not
+Server => mobile app
+**/
+{
+    "type": "scoreUpdate",
+    "data": {
+        "isOver": true, //boolean to capture if the game is over or not
+        "rankings": [ //this array is ordered corresponding to the rankings (i.e., player at index 0 is in first and so on)
+            {
+                "player": "XYZ", //name of the player
+                "score": 0 //positive integer corresponding to the given player's current score
+            }
+        ]
+    }
+}
