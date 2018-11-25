@@ -42,16 +42,20 @@ def InitializeServerSocket (state):
 #this method should run in its own thread
 #pass in a configuration, initial state, and a callback to execute when a successful connection is made
 def AdvertiseAndListen (config, state, connection_callback):
-    bluetooth.advertise_service(state._server_socket, config._service_name, config._uuid)
+    #set up and start listening
+    port = bluetooth.PORT_ANY
+    state._server_socket.bind(("", port))
+    state._server_socket.listen(1)
+    bluetooth.advertise_service(state._server_socket, config._service_name,
+                   service_id = config._uuid,
+                   service_classes = [ config._uuid, bluetooth.SERIAL_PORT_CLASS ],
+                   profiles = [ bluetooth.SERIAL_PORT_PROFILE ], 
+                    )
+    
     state._online = True
     while (state._online == True and state._stop_listening == False):
         #can't have more than 7 active client connections
         if state._num_connections < 8:
-            #set up and start listening
-            port = bluetooth.get_available_port(bluetooth.RFCOMM)
-            state._server_socket.bind(("", port))
-            state._server_socket.listen(5)
-            
             #use select to poll the socket
             #only poll if the timeout threshold hasn't been hit
             read_list = [state._server_socket]
