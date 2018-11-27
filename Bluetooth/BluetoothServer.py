@@ -21,7 +21,6 @@ class BluetoothServerState:
     def __init__(self):
         self._server_socket = None
         self._online = False
-        self._stop_listening = False
         self._num_connections = 0
 
 #object representing a successfully connected client to the server
@@ -53,13 +52,12 @@ def AdvertiseAndListen (config, state, connection_callback):
                     )
     
     state._online = True
-    while (state._online == True and state._stop_listening == False):
+    while (state._online == True and state._server_socket != None):
         #can't have more than 7 active client connections
         if state._num_connections < 8:
             #use select to poll the socket
-            #only poll if the timeout threshold hasn't been hit
             read_list = [state._server_socket]
-            while (state._stop_listening == False):
+            while (state._online == True and state._server_socket != None):
                 readable, writable, errored = select.select(read_list, [], [])
                 for s in readable:
                     if s is state._server_socket:
@@ -74,19 +72,11 @@ def AdvertiseAndListen (config, state, connection_callback):
 
 #method to close the communication socket
 def CloseServerSocket (state):
-    if state._online == True and state._stop_listening == True and state._num_connections == 0:
+    if state._online == True and state._num_connections == 0:
         state._server_socket.close()
         state._server_socket = None
         state._online = False
-        state._stop_listening = False
         state._num_connections = 0
-    return None
-    
-#method to indicate that the server is ready to close its connections and thus set the appropriate flag
-#flag must be set so that individual threads that are running know to finish up
-def FlagConnectionTermination(state):
-    if state._online == True and state._stop_listening == False:
-        state._stop_listening = True
     return None
 
 #method to close the communication socket for all provided clients
@@ -101,7 +91,7 @@ def CloseClientSocket(client, state):
 #this method should be run in a single thread per client
 def ListenForIncomingData (client, read_callback):
     read_list = [client._client_socket]
-    while (state._online == True and state._stop_listening == False and client._is_open == True):
+    while (state._online == True and state._server_socket != None and client._is_open == True):
         readable, writable, errored = select.select(read_list, [], [])
         for s in readable:
             if s is client._client_socket:
@@ -113,7 +103,7 @@ def ListenForIncomingData (client, read_callback):
 #method to write data to a specific client
 def WriteToClient (client, data):
     write_list = [client._client_socket]
-    while (state._online == True and state._stop_listening == False and client._is_open == True):
+    while (state._online == True and state._server_socket != None and client._is_open == True):
         readable, writable, errored = select.select([], write_list, [])
         for s in writable:
             if s is client._client_socket:

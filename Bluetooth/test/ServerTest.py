@@ -44,7 +44,6 @@ for x in range(6):
         
 #wait another minute, then close everything up
 time.sleep(60)
-FlagConnectionTermination(bt_state)
 for z in clients:
     CloseClientSocket(clients[z], bt_state)
 CloseServerSocket(bt_state)

@@ -4,12 +4,14 @@ This is a Python-executable server to facilitate the Quizzly application
 
 #imports
 import sys
+import os
+from sys import path
 import json
 import time
 import random
 from Config import *
 
-sys.path.insert(0, './bin')
+sys.path.insert(0, './data')
 from DataStructures import *
 
 sys.path.insert(0, '../Bluetooth')
@@ -29,7 +31,7 @@ in_progress = False
 
 #method to read in the questions file
 def Read_Questions(path_to_questions):
-    json_data = open(file_directory).read()
+    json_data = open(path_to_questions).read()
     return json.loads(json_data)
         
 
@@ -42,11 +44,13 @@ def Write_Log(path_to_log, log_tag, log_message):
     try:
         if log_tag == "ERROR":
             with open(path_to_log, "a") as log_file:
-                msg = (timestamp + '\t[' + log_tag + ']\t' + str(log_message))
+                msg = (timestamp + '\t[' + log_tag + ']\t' + str(log_message) + "\n")
+                log_file.write(msg)
         #log_message is a string
         else:
             with open(path_to_log, "a") as log_file:
-                msg = (timestamp + '\t[' + log_tag + ']\t' + log_message)
+                msg = (timestamp + '\t[' + log_tag + ']\t' + log_message + "\n")
+                log_file.write(msg)
     except Exception as e:
         print (str(e))
 
@@ -97,7 +101,6 @@ def on_read(client_uuid, response):
         Write_Log(log_path, "ERROR", e)
 
 ##### MAIN EXECUTION #####
-#TODO: how to gracefully shut down???
 if __name__ == "__main__":
     
     #create config and state objects
@@ -108,6 +111,7 @@ if __name__ == "__main__":
     #load available questions
     log_path = config.log_path
     available_questions = Read_Questions(config.question_file_path)
+    Write_Log(log_path, "INFO", "The Quizzly server is coming online.")
     
     #start by initializing the server socket
     InitializeServerSocket(bt_state)
@@ -117,72 +121,75 @@ if __name__ == "__main__":
     t_listener.start()
     
     #loop indefinitely trying to run games as long as game_on flag is set
-    while (game_on):
-    
-        #wait for 4 players or a predetermined amount of time
-        sleep_count = 0
-        while (sleep_count < config.max_join_wait and len(players) < 4):
-            time.sleep(config.join_sleep_time)
-            sleep_count = sleep_count + 1
+    try:
+        while (game_on):
 
-        #give players an extra bit of time to create their usernames
-        time.sleep(config.extra_join_time)
+            #wait for 4 players or a predetermined amount of time
+            sleep_count = 0
+            while (sleep_count < config.max_join_wait and len(players) < 4):
+                time.sleep(config.join_sleep_time)
+                sleep_count = sleep_count + 1
 
-        #only continue this game if there are players in it
-        if len(players) > 0:
-            #start by initializing the score and sending an initial score update
-            in_progress = True
-            score = Score(players)
-            for x in players:
-                try:
-                    WriteToClient(x._connection._uuid, score.ToJson(False))
-                except Exception as e:
-                    Write_Log(log_path, "ERROR", e)
+            #give players an extra bit of time to create their usernames
+            time.sleep(config.extra_join_time)
 
-            #loop through a predetermined number of rounds
-            round_counter = 0
-            while (round_counter < config.number_rounds):
-                #pick an unused question in this game
-                q_found = False
-                while (not q_found):
-                    pot = random.choice(available_questions)
-                    if not pot['number'] in used_questions:
-                        current_question = Question(pot)
-                        used_questions[pot['number']] = True
-                        q_found = True
-
-                #send the question to each player
+            #only continue this game if there are players in it
+            if len(players) > 0:
+                #start by initializing the score and sending an initial score update
+                in_progress = True
+                score = Score(players)
                 for x in players:
                     try:
-                        WriteToClient(x._connection._uuid, current_question.ToJson())
+                        WriteToClient(x._connection._uuid, score.ToJson(False))
                     except Exception as e:
                         Write_Log(log_path, "ERROR", e)
 
-                #wait for a predetermined amount of time
-                time.sleep(round_wait_time)
+                #loop through a predetermined number of rounds
+                round_counter = 0
+                while (round_counter < config.number_rounds):
+                    #pick an unused question in this game
+                    q_found = False
+                    while (not q_found):
+                        pot = random.choice(available_questions)
+                        if not pot['number'] in used_questions:
+                            current_question = Question(pot)
+                            used_questions[pot['number']] = True
+                            q_found = True
 
-                #send a new score update
-                is_over = (round_counter == config.number_rounds - 1)
+                    #send the question to each player
+                    for x in players:
+                        try:
+                            WriteToClient(x._connection._uuid, current_question.ToJson())
+                        except Exception as e:
+                            Write_Log(log_path, "ERROR", e)
+
+                    #wait for a predetermined amount of time
+                    time.sleep(round_wait_time)
+
+                    #send a new score update
+                    is_over = (round_counter == config.number_rounds - 1)
+                    for x in players:
+                        try:
+                            WriteToClient(x._connection._uuid, score.ToJson(is_over))
+                        except Exception as e:
+                            Write_Log(log_path, "ERROR", e)
+
+                    round_counter = round_counter + 1
+
+                #game is over so close all open client sockets
                 for x in players:
                     try:
-                        WriteToClient(x._connection._uuid, score.ToJson(is_over))
+                        CloseClientSocket(x._connection._uuid)
                     except Exception as e:
                         Write_Log(log_path, "ERROR", e)
-
-                round_counter = round_counter + 1
-
-            #game is over so close all open client sockets
-            for x in players:
-                try:
-                    CloseClientSocket(x._connection._uuid)
-                except Exception as e:
-                    Write_Log(log_path, "ERROR", e)
-            players = []
-            score = None
-            used_questions = {}
-            current_question = None
-            in_progress = False
+                players = []
+                score = None
+                used_questions = {}
+                current_question = None
+                in_progress = False
+    except KeyboardInterrupt:
+        game_on = False
     
     #if we get here, the server has been told to shut down
-    FlagConnectionTermination(bt_state)
+    Write_Log(log_path, "INFO", "The Quizzly server is shutting down.")
     CloseServerSocket(bt_state)

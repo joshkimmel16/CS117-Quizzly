@@ -7,3 +7,4 @@ __pycache__/
 # Random Specific Files (TODO: Remove at end of project) #
 ##########################################################
 *BluetoothLib.py
+*log/*
