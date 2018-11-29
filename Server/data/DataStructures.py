@@ -15,7 +15,7 @@ class Player:
         
     #method to initialize the player based on data provided from a client 
     def InitializePlayer(self, data):
-        self._name = data["playerNam"]
+        self._name = data["playerName"]
         
 
 #object representing a question in a Quizzly game
@@ -59,7 +59,7 @@ class Score:
     #convert to JSON for transmission
     def ToJson(self, is_over):
         output = {'type': "scoreUpdate", 'data': {'isOver': is_over, 'rankings': []}}
-        sorted_rankings = sorted(self._rankings, key=lambda x: x.score, reverse=True)
+        sorted_rankings = sorted(self._rankings, key=lambda x: x['score'], reverse=True)
         for x in sorted_rankings:
-            output['data'].rankings.append({'playerName': x['name'], 'score': x['score']})
+            output['data']['rankings'].append({'playerName': x['name'], 'score': x['score']})
         return json.dumps(output)

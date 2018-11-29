@@ -89,24 +89,26 @@ def CloseClientSocket(client, state):
 
 #method to listen for incoming data from a specific client
 #this method should be run in a single thread per client
-def ListenForIncomingData (client, read_callback):
+def ListenForIncomingData (state, client, read_callback):
     read_list = [client._client_socket]
     while (state._online == True and state._server_socket != None and client._is_open == True):
         readable, writable, errored = select.select(read_list, [], [])
         for s in readable:
             if s is client._client_socket:
-                data = s.recv()
+                data = s.recv(1024)
                 process_response = Thread(target=read_callback, args=[client._uuid, data])
                 process_response.start()
     return None
 
 #method to write data to a specific client
-def WriteToClient (client, data):
+def WriteToClient (state, client, data):
     write_list = [client._client_socket]
-    while (state._online == True and state._server_socket != None and client._is_open == True):
+    write_done = False
+    while (state._online == True and state._server_socket != None and client._is_open == True and not write_done):
         readable, writable, errored = select.select([], write_list, [])
         for s in writable:
             if s is client._client_socket:
                 client._client_socket.send(data)
+                write_done = True
                 break
     return None

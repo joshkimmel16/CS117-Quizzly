@@ -26,6 +26,7 @@ used_questions = {}
 score = None
 current_question = None
 in_progress = False
+bt_state = None
 
 ##### HELPER METHODS #####
 
@@ -58,13 +59,20 @@ def Write_Log(path_to_log, log_tag, log_message):
 
 #method to create a new player in the game
 def PlayerCreation(client_uuid, player_data):
+    client = None
+    for x in players:
+        if client_uuid == x._connection._uuid:
+            client = x
+            break
+    
     try:
-        if (len(players) < 4 and not in_progress):
-            for x in players:
-                if client_uuid == x._connection._uuid:
-                    x.InitializePlayer(player_data)
+        if (len(players) < 4 and not in_progress and client != None):
+            client.InitializePlayer(player_data)
         else:
-            WriteToClient(client_uuid, json.dumps({'type': 'error', 'data': {'message': "A full game is already in progress. Please try again later."}}))
+            if client != None:
+                WriteToClient(bt_state, client._connection, json.dumps({'type': 'error', 'data': {'message': "A full game is already in progress. Please try again later."}}))
+            else:
+                Write_Log(log_path, "ERROR", "UUID: " + client_uuid + " is missing!")
     except Exception as e:
         Write_Log(log_path, "ERROR", e)
 
@@ -84,7 +92,7 @@ def CaptureAnswer(client_uuid, provided_answer):
 def on_connection(new_client):
     try:
         players.append(Player(new_client))
-        t_reader = Thread(target=ListenForIncomingData, args=[new_client, on_read])
+        t_reader = Thread(target=ListenForIncomingData, args=[bt_state, new_client, on_read])
         t_reader.start()
     except Exception as e:
         Write_Log(log_path, "ERROR", e)
@@ -136,11 +144,12 @@ if __name__ == "__main__":
             #only continue this game if there are players in it
             if len(players) > 0:
                 #start by initializing the score and sending an initial score update
+                Write_Log(log_path, "INFO", "The game has begun.")
                 in_progress = True
                 score = Score(players)
                 for x in players:
                     try:
-                        WriteToClient(x._connection._uuid, score.ToJson(False))
+                        WriteToClient(bt_state, x._connection, score.ToJson(False))
                     except Exception as e:
                         Write_Log(log_path, "ERROR", e)
 
@@ -159,27 +168,28 @@ if __name__ == "__main__":
                     #send the question to each player
                     for x in players:
                         try:
-                            WriteToClient(x._connection._uuid, current_question.ToJson())
+                            WriteToClient(bt_state, x._connection, current_question.ToJson())
                         except Exception as e:
                             Write_Log(log_path, "ERROR", e)
 
                     #wait for a predetermined amount of time
-                    time.sleep(round_wait_time)
+                    time.sleep(config.round_wait_time)
 
                     #send a new score update
                     is_over = (round_counter == config.number_rounds - 1)
                     for x in players:
                         try:
-                            WriteToClient(x._connection._uuid, score.ToJson(is_over))
+                            WriteToClient(bt_state, x._connection, score.ToJson(is_over))
                         except Exception as e:
                             Write_Log(log_path, "ERROR", e)
 
                     round_counter = round_counter + 1
+                    time.sleep(1) #yield CPU
 
                 #game is over so close all open client sockets
                 for x in players:
                     try:
-                        CloseClientSocket(x._connection._uuid)
+                        CloseClientSocket(x._connection, bt_state)
                     except Exception as e:
                         Write_Log(log_path, "ERROR", e)
                 players = []
@@ -187,6 +197,7 @@ if __name__ == "__main__":
                 used_questions = {}
                 current_question = None
                 in_progress = False
+                Write_Log(log_path, "INFO", "The game has ended.")
     except KeyboardInterrupt:
         game_on = False
     
