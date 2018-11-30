@@ -56,6 +56,7 @@ if __name__ == "__main__":
 
             #start listening for data from the server on a seperate thread
             t_listener = Thread(target=ReadFromServer, args=[bt_state, on_read])
+            t_listener.daemon = True
             t_listener.start()
 
             #create the player

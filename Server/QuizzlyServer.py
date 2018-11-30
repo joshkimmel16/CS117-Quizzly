@@ -93,6 +93,7 @@ def on_connection(new_client):
     try:
         players.append(Player(new_client))
         t_reader = Thread(target=ListenForIncomingData, args=[bt_state, new_client, on_read])
+        t_reader.daemon = True
         t_reader.start()
     except Exception as e:
         Write_Log(log_path, "ERROR", e)
@@ -126,6 +127,7 @@ if __name__ == "__main__":
     
     #start listening for incoming connections in a separate thread
     t_listener = Thread(target=AdvertiseAndListen, args=[bt_config, bt_state, on_connection])
+    t_listener.daemon = True
     t_listener.start()
     
     #loop indefinitely trying to run games as long as game_on flag is set
