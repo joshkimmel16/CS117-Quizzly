@@ -106,6 +106,8 @@ def on_read(client_uuid, response):
             PlayerCreation(client_uuid, data['data'])
         elif data['type'] == 'answer':
             CaptureAnswer(client_uuid, data['data'])
+        elif data['type'] == 'socketError':
+            Write_Log(log_path, "INFO", "Socket for client " + str(client_uuid) + " has been closed.")
     except Exception as e:
         Write_Log(log_path, "ERROR", e)
 

@@ -94,10 +94,15 @@ def ListenForIncomingData (state, client, read_callback):
     while (state._online == True and state._server_socket != None and client._is_open == True):
         readable, writable, errored = select.select(read_list, [], [])
         for s in readable:
-            if s is client._client_socket:
-                data = s.recv(1024)
-                process_response = Thread(target=read_callback, args=[client._uuid, data])
-                process_response.start()
+            if client._is_open == True and s is client._client_socket:
+                try:
+                    data = s.recv(1024)
+                    process_response = Thread(target=read_callback, args=[client._uuid, data])
+                    process_response.start()
+                except:
+                    data = '{"type": "socketError"}'
+                    process_response = Thread(target=read_callback, args=[client._uuid, data])
+                    process_response.start()
     return None
 
 #method to write data to a specific client

@@ -22,16 +22,26 @@ bt_state = BluetoothClientState()
 ##### GAME PLAY METHODS #####
 
 def Question(q_data):
-    print q_data
-    i = randint(0, 3)
+    print "Category: " + q_data['category']
+    print q_data["question"]
+    for x in q_data["options"]:
+        print x
+    print ""
+    i = input("Please enter an answer 0-3: ")
     r = '{"type": "answer", "data": {"number": ' + str(q_data["number"]) + ', "answer": ' + str(i) + '}}'
-    WriteToServer(bt_state, r)                                                
+    WriteToServer(bt_state, r)
+    print "\n"
 
 def ShowScore(s_data):
-    print s_data
-    if s_data['isOver'] == True:
+    for x in s_data["rankings"]:
+        print x["playerName"] + " has score : " + str(x["score"])
+    print "\n"
+    if s_data["isOver"] == True:
         print 'The game is now over!'
         game_over = True
+    else:
+        print "Moving to next round!"
+        print "\n"
 
 ##### EVENT HANDLERS #####
 
@@ -60,7 +70,8 @@ if __name__ == "__main__":
             t_listener.start()
 
             #create the player
-            p = '{"type": "playerCreation", "data": {"playerName": "TestPlayer"}}'
+            p_name = input("Please enter your name: ")
+            p = '{"type": "playerCreation", "data": {"playerName": "' + str(p_name) + '"}}'
             WriteToServer(bt_state, p)
 
             while (not game_over):
@@ -71,6 +82,9 @@ if __name__ == "__main__":
                             Question(task['data'])
                         elif task['type'] == 'scoreUpdate':
                             ShowScore(task['data'])
+                        elif task['type'] == 'socketError':
+                            print 'The server socket is no longer readable'
+                            game_over = True
                     except Exception as e:
                         print str(e)
                     time.sleep(1)

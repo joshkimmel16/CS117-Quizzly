@@ -53,11 +53,15 @@ def ReadFromServer(state, read_callback):
     while (state._connected == True and state._socket != None):
         readable, writable, errored = select.select(read_list, [], [])
         for s in readable:
-            if s is state._socket:
-                data = s.recv(1024)
-                print data
-                process_response = Thread(target=read_callback, args=[data])
-                process_response.start()
+            if state._socket != None and s is state._socket:
+                try:
+                    data = s.recv(1024)
+                    process_response = Thread(target=read_callback, args=[data])
+                    process_response.start()
+                except:
+                    data = '{"type": "socketError"}'
+                    process_response = Thread(target=read_callback, args=[data])
+                    process_response.start()
     return None
 
 #method to write data to the server
