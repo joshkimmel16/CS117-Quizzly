@@ -21,13 +21,13 @@ This folder contains the Quizzly client implementation.
 
 ## Activities
   - Home Screen (Enables creation of user and sends user details to backend bluetooth master)
-    - xml
+    - activyt_home_screen.xml
     - class
   - Question/Answer Screen( Recieves Questions and Answer from the Backend bluetooth server and displays it along with  options)  Sends the selected option to server
-    - xml
+    - activity_main.xml
     - class
   - Score (Recieves score object from backend and displays it)
-    - xml
+    - activity_score_screen.xml
     - class
 ## Authors
 
