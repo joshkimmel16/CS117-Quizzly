@@ -8,20 +8,27 @@ The following is a high-level overview of the repository:
 
 ### Bluetooth
 
-This folder contains the Bluetooth API that is used in the project. TODO: complete interface.
+This folder contains the Bluetooth API that is used in the project. 
 
 ### Server
 
-This folder contains the Quizzly server implementation. TODO: complete the server.
+This folder contains the Quizzly server implementation. 
 
 ### Client
 
-This folder contains the Quizzly client implementation. TODO: complete the client.
-
+This folder contains the Quizzly client implementation.
 ## Installing
 
-TODO: write installations instructions.
-
+## Activities
+  - Home Screen (Enables creation of user and sends user details to backend bluetooth master)
+    - xml
+    - class
+  - Question/Answer Screen( Recieves Questions and Answer from the Backend bluetooth server and displays it along with  options)  Sends the selected option to server
+    - xml
+    - class
+  - Score (Recieves score object from backend and displays it)
+    - xml
+    - class
 ## Authors
 
 * **Josh Kimmel** - *Bluetooth Interface* - (https://github.com/joshkimmel16)
