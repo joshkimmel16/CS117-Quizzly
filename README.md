@@ -32,6 +32,6 @@ This folder contains the Quizzly client implementation.
 ## Authors
 
 * **Josh Kimmel** - *Bluetooth Interface* - (https://github.com/joshkimmel16)
-* **Peiqi Wu** - *???* - (https://github.com/???)
-* **Kunjan Patel** - *???* - (https://github.com/coolkp)
-* **Jayant Mehra** - *???* - (https://github.com/???)
+* **Peiqi Wu** - Question Activity - (https://github.com/???)
+* **Kunjan Patel** - Home Activity - (https://github.com/coolkp)
+* **Jayant Mehra** - Score Activity - (https://github.com/???)
