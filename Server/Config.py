@@ -10,7 +10,8 @@ class Config:
         self.question_file_path = './data/questions.json' #path for available questions file
         self.max_join_wait = 3 #this corresponds to waiting for this times join_sleep_time seconds for players to join a game
         self.join_sleep_time = 5 #this corresponds to sleeping for this number of seconds before checking whether or not the game is ready
-        self.extra_join_time = 1 #give players an extra this number of seconds to create and send their usernames once all players have joined
-        self.number_rounds = 8 #each game consists of this many rounds
+        self.extra_join_time = 10 #give players an extra this number of seconds to create and send their usernames once all players have joined
+        self.number_rounds = 2 #each game consists of this many rounds
         self.round_wait_time = 30 #each round lasts for this number of seconds
+        self.score_wait_time = 5 #after each round wait for this number of seconds before moving to the next round
         

@@ -188,7 +188,7 @@ if __name__ == "__main__":
                             Write_Log(log_path, "ERROR", e)
 
                     round_counter = round_counter + 1
-                    time.sleep(1) #yield CPU
+                    time.sleep(config.score_wait_time) #yield CPU
 
                 #game is over so close all open client sockets
                 for x in players:
