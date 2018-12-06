@@ -2,9 +2,14 @@
 A sample server that uses the BluetoothServer library
 '''
 
-from BluetoothServer import *
+import sys
+import os
+from sys import path
 from threading import Thread
 import time
+
+path.append(os.getcwd() + "\\..")
+from BluetoothServer import *
 
 #define callbacks to be used for incoming connections and client data
 clients = {}
@@ -14,7 +19,7 @@ def on_connection(new_client):
     t_reader.start()
     return None
 def on_read(client_uuid, data):
-    print "Client " + client_uuid + " said: " + str(data)
+    print ("Client " + client_uuid + " said: " + str(data))
     return None
 
 #create config and state objects
@@ -32,14 +37,13 @@ t_listener.start()
 
 #every 10 seconds write a message to all active clients
 #do this exactly 6 times
-for x in xrange(6):
+for x in range(6):
     time.sleep(10)
     for y in clients:
         WriteToClient(clients[y], "Hello this is your server speaking.")
         
 #wait another minute, then close everything up
 time.sleep(60)
-FlagConnectionTermination(bt_state)
 for z in clients:
     CloseClientSocket(clients[z], bt_state)
 CloseServerSocket(bt_state)

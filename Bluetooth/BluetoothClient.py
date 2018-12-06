@@ -19,7 +19,6 @@ class BluetoothClientState:
     def __init__(self):
         self._socket = None
         self._connected = False
-        self._end_connection = False
         self._connection_candidates = []
         
 #method to display possible Bluetooth servers to connect to given a state and config
@@ -36,46 +35,44 @@ def ConnectToBluetoothServer(state, candidate):
         state._socket = bluetooth.BluetoothSocket( bluetooth.RFCOMM )
         state._socket.connect((candidate["host"], candidate["port"]))
         state._connected = True
-        state._end_connection = False
-    return None
-
-#method to indicate that the client is ready to close its connection and thus set the appropriate flag
-#flag must be set so that individual threads that are running know to finish up
-def FlagConnectionTermination(state):
-    if state._connected == True and state._end_connection == False:
-        state._end_connection = True
     return None
 
 #method to disconnect from a Bluetooth server
 #takes a client state as input
 def DisconnectFromBluetoothServer(state):
-    if state._connected == True and state._end_connection == True:
+    if state._connected == True and state._socket != None:
         state._socket.close()
         state._socket = None
         state._connected = False
-        state._end_connection = False
     return None
 
 #method to listen for incoming data from the server
 #this method should be run in a single thread
 def ReadFromServer(state, read_callback):
     read_list = [state._socket]
-    while (state._connected == True and state._end_connection == False):
+    while (state._connected == True and state._socket != None):
         readable, writable, errored = select.select(read_list, [], [])
         for s in readable:
-            if s is state._socket:
-                data = s.recv()
-                process_response = Thread(target=read_callback, args=[data])
-                process_response.start()
+            if state._socket != None and s is state._socket:
+                try:
+                    data = s.recv(1024)
+                    process_response = Thread(target=read_callback, args=[data])
+                    process_response.start()
+                except:
+                    data = '{"type": "socketError"}'
+                    process_response = Thread(target=read_callback, args=[data])
+                    process_response.start()
     return None
 
 #method to write data to the server
 def WriteToServer(state, data):
     write_list = [state._socket]
-    while (state._connected == True and state._end_connection == False):
+    write_done = False
+    while (state._connected == True and state._socket != None and not write_done):
         readable, writable, errored = select.select([], write_list, [])
         for s in writable:
             if s is state._socket:
                 state._socket.send(data)
+                write_done = True
                 break
     return None

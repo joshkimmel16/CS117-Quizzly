@@ -2,13 +2,18 @@
 A sample client that uses the BluetoothClient library
 '''
 
-from BluetoothClient import *
+import sys
+import os
+from sys import path
 from threading import Thread
 import time
 
+path.append(os.getcwd() + "\\..")
+from BluetoothClient import *
+
 #define callback to be used for incoming reads
 def on_read(data):
-    print "The server said: " + str(data)
+    print ("The server said: " + str(data))
     return None
 
 #create config and state objects
@@ -19,7 +24,7 @@ bt_state = BluetoothClientState()
 #get and print all server candidates
 GetConnectionCandidates(bt_state, bt_config)
 for x in bt_state._connection_candidates:
-    print x
+    print (x)
 
 #connect to the first candidate
 if len(bt_state._connection_candidates) > 0:
