@@ -20,7 +20,7 @@ TODO: Shouldn't be committing actual values in the config.
 
 ### Client
 
-This folder contains the Quizzly client implementation. TODO: complete the client.
+This folder contains sample command line applications to simulate players for testing. One (SampleQuizzlyClient.py) is entirely automated. The other (SampleQuizzlyPlayer.py) is an interactive command line interface to play the game. 
 
 ## Installing
 
@@ -40,13 +40,13 @@ python QuizzlyServer.py
 
 TODO: create an installer for all platforms.
 
-### Android Application
+### Client
 
-TODO: write installations instructions.
+#### Dependencies
+
+* [Python 2.7.x](https://www.python.org/downloads/) - Implementation framework
+* [PyBluez](https://github.com/pybluez/pybluez) - Bluetooth socket library for Python
 
 ## Authors
 
-* **Josh Kimmel** - *Quizzly Server, Bluetooth Python and Java Interfaces* - (https://github.com/joshkimmel16)
-* **Peiqi Wu** - *???* - (https://github.com/???)
-* **Revaz Patel** - *???* - (https://github.com/???)
-* **Jayant Mehra** - *???* - (https://github.com/???)
+* **Josh Kimmel** - *Quizzly Server, Bluetooth Libraries* - (https://github.com/joshkimmel16)
