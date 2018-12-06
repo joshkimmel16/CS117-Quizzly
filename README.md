@@ -8,35 +8,6 @@ The following is a high-level overview of the repository:
 
 ### Bluetooth
 
-<<<<<<< HEAD
-This folder contains the Bluetooth API that is used in the project. 
-
-### Server
-
-This folder contains the Quizzly server implementation. 
-
-### Client
-
-This folder contains the Quizzly client implementation.
-## Installing
-
-## Activities
-  - Home Screen (Enables creation of user and sends user details to backend bluetooth master)
-    - activyt_home_screen.xml
-    - class
-  - Question/Answer Screen( Recieves Questions and Answer from the Backend bluetooth server and displays it along with  options)  Sends the selected option to server
-    - activity_main.xml
-    - class
-  - Score (Recieves score object from backend and displays it)
-    - activity_score_screen.xml
-    - class
-## Authors
-
-* **Josh Kimmel** - *Bluetooth Interface* - (https://github.com/joshkimmel16)
-* **Peiqi Wu** - Question Activity - (https://github.com/???)
-* **Kunjan Patel** - Home Activity - (https://github.com/coolkp)
-* **Jayant Mehra** - Score Activity - (https://github.com/???)
-=======
 This folder contains the Bluetooth API that is used by the server. There is also a client-side implementation that is primarily used for testing purposes. Each library also has a corresponding sample (in /test) to demonstrate usage.
 
 ### Server
@@ -79,4 +50,3 @@ TODO: create an installer for all platforms.
 ## Authors
 
 * **Josh Kimmel** - *Quizzly Server, Bluetooth Libraries* - (https://github.com/joshkimmel16)
->>>>>>> BTLib
